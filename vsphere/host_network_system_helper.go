@@ -69,3 +69,28 @@ func hostVSwitchFromName(client *govmomi.Client, name, host, datacenter string, 
 
 	return nil, fmt.Errorf("vSwitch %s not found on host %s", name, host)
 }
+
+// hostPortGroupFromName locates a host port group from its assigned name and
+// host, using the client's default property collector.
+func hostPortGroupFromName(client *govmomi.Client, name, host, datacenter string, timeout time.Duration) (*types.HostPortGroup, error) {
+	ns, err := hostNetworkSystemFromName(client, host, datacenter)
+	if err != nil {
+		return nil, fmt.Errorf("error loading network system: %s", err)
+	}
+
+	var mns mo.HostNetworkSystem
+	pc := client.PropertyCollector()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	if err := pc.RetrieveOne(ctx, ns.Reference(), []string{"networkInfo.portgroup"}, &mns); err != nil {
+		return nil, fmt.Errorf("error fetching host network properties: %s", err)
+	}
+
+	for _, pg := range mns.NetworkInfo.Portgroup {
+		if pg.Spec.Name == name {
+			return &pg, nil
+		}
+	}
+
+	return nil, fmt.Errorf("port group %s not found on host %s", name, host)
+}
