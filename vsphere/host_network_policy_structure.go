@@ -67,13 +67,11 @@ func schemaHostNetworkPolicy() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Optional:    true,
 			Description: "The average bandwidth in bits per second if shaping is enabled on the port.",
-			Default:     0,
 		},
 		"shaping_burst_size": &schema.Schema{
 			Type:        schema.TypeInt,
 			Optional:    true,
 			Description: "The maximum burst size allowed in bytes if shaping is enabled on the port.",
-			Default:     0,
 		},
 		"shaping_enabled": &schema.Schema{
 			Type:        schema.TypeBool,
@@ -84,7 +82,6 @@ func schemaHostNetworkPolicy() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Optional:    true,
 			Description: "The peak bandwidth during bursts in bits per second if traffic shaping is enabled on the port.",
-			Default:     0,
 		},
 	}
 }
