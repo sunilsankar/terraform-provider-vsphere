@@ -2,6 +2,7 @@ package vsphere
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/vmware/govmomi/vim25/types"
 )
 
@@ -11,10 +12,11 @@ func schemaHostVirtualSwitchBondBridge() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		// HostVirtualSwitchBeaconConfig
 		"beacon_interval": &schema.Schema{
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "Determines how often, in seconds, a beacon should be sent to probe for the validity of a link.",
-			Default:     1,
+			Type:         schema.TypeInt,
+			Optional:     true,
+			Description:  "Determines how often, in seconds, a beacon should be sent to probe for the validity of a link.",
+			Default:      1,
+			ValidateFunc: validation.IntAtLeast(0),
 		},
 
 		// LinkDiscoveryProtocolConfig
