@@ -39,7 +39,7 @@ func schemaHostVirtualSwitchBondBridge() map[string]*schema.Schema {
 		"network_adapters": &schema.Schema{
 			Type:        schema.TypeList,
 			Required:    true,
-			Description: "The link discovery protocol configuration for the virtual switch.",
+			Description: "The list of network adapters to bind to this virtual switch.",
 			Elem:        &schema.Schema{Type: schema.TypeString},
 		},
 	}
