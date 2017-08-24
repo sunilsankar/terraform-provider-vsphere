@@ -51,12 +51,12 @@ func schemaHostNetworkPolicy() map[string]*schema.Schema {
 			Optional:    true,
 			Description: "Enable promiscuous mode on the network. This flag indicates whether or not all traffic is seen on a given port.",
 		},
-		"forged_transmits": &schema.Schema{
+		"allow_forged_transmits": &schema.Schema{
 			Type:        schema.TypeBool,
 			Optional:    true,
 			Description: "Controls whether or not the virtual network adapter is allowed to send network traffic with a different MAC address than that of its own.",
 		},
-		"mac_changes": &schema.Schema{
+		"allow_mac_changes": &schema.Schema{
 			Type:        schema.TypeBool,
 			Optional:    true,
 			Description: "Controls whether or not the Media Access Control (MAC) address can be changed.",
@@ -196,10 +196,10 @@ func expandHostNetworkSecurityPolicy(d *schema.ResourceData) *types.HostNetworkS
 	if v, ok := d.GetOkExists("allow_promiscuous"); ok {
 		obj.AllowPromiscuous = &([]bool{v.(bool)}[0])
 	}
-	if v, ok := d.GetOkExists("forged_transmits"); ok {
+	if v, ok := d.GetOkExists("allow_forged_transmits"); ok {
 		obj.ForgedTransmits = &([]bool{v.(bool)}[0])
 	}
-	if v, ok := d.GetOkExists("mac_changes"); ok {
+	if v, ok := d.GetOkExists("allow_mac_changes"); ok {
 		obj.MacChanges = &([]bool{v.(bool)}[0])
 	}
 	return obj
@@ -212,10 +212,10 @@ func flattenHostNetworkSecurityPolicy(d *schema.ResourceData, obj *types.HostNet
 		d.Set("allow_promiscuous", *obj.AllowPromiscuous)
 	}
 	if obj.ForgedTransmits != nil {
-		d.Set("forged_transmits", *obj.ForgedTransmits)
+		d.Set("allow_forged_transmits", *obj.ForgedTransmits)
 	}
 	if obj.MacChanges != nil {
-		d.Set("mac_changes", *obj.MacChanges)
+		d.Set("allow_mac_changes", *obj.MacChanges)
 	}
 	return nil
 }

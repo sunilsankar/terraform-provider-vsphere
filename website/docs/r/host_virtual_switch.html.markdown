@@ -47,9 +47,9 @@ resource "vsphere_host_virtual_switch" "switch" {
   standby_nics   = ["vmnic1"]
   teaming_policy = "failover_explicit"
 
-  allow_promiscuous = false
-  forged_transmits  = false
-  mac_changes       = false
+  allow_promiscuous      = false
+  allow_forged_transmits = false
+  allow_mac_changes      = false
 
   shaping_enabled           = true
   shaping_average_bandwidth = 50000000
@@ -132,11 +132,11 @@ probing (configured with [`check_beacon`](#check_beacon)).
 * `allow_promiscuous` - (Boolean, optional) Enable promiscuous mode on the
   network. This flag indicates whether or not all traffic is seen on a given
   port. Default: `false`.
-* `forged_transmits` - (Boolean, optional) Controls whether or not the virtual
-  network adapter is allowed to send network traffic with a different MAC
-  address than that of its own. Default: `true`.
-* `mac_changes` - (Boolean, optional) Controls whether or not the Media Access
-  Control (MAC) address can be changed. Default: `true`.
+* `allow_forged_transmits` - (Boolean, optional) Controls whether or not the
+  virtual network adapter is allowed to send network traffic with a different
+  MAC address than that of its own. Default: `true`.
+* `allow_mac_changes` - (Boolean, optional) Controls whether or not the Media
+  Access Control (MAC) address can be changed. Default: `true`.
 
 #### Traffic Shaping Options
 

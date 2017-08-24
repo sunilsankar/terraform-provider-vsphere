@@ -44,8 +44,8 @@ func resourceVSphereHostVirtualSwitch() *schema.Resource {
 	s["failback"].Default = true
 
 	s["allow_promiscuous"].Default = false
-	s["forged_transmits"].Default = true
-	s["mac_changes"].Default = true
+	s["allow_forged_transmits"].Default = true
+	s["allow_mac_changes"].Default = true
 
 	s["shaping_enabled"].Default = false
 
