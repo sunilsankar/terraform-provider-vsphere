@@ -67,7 +67,7 @@ func resourceVSphereHostVirtualSwitchCreate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("error loading network system: %s", err)
 	}
 
-	timeout := time.Duration(float64(d.Timeout(schema.TimeoutCreate)) * 0.8)
+	timeout := time.Minute * 5
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	spec := expandHostVirtualSwitchSpec(d)
@@ -80,7 +80,7 @@ func resourceVSphereHostVirtualSwitchCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceVSphereHostVirtualSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	timeout := time.Duration(float64(d.Timeout(schema.TimeoutCreate)) * 0.8)
+	timeout := time.Minute * 5
 	id := d.Id()
 	host := d.Get("host").(string)
 	datacenter := d.Get("datacenter").(string)
@@ -105,7 +105,7 @@ func resourceVSphereHostVirtualSwitchUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("error loading network system: %s", err)
 	}
 
-	timeout := time.Duration(float64(d.Timeout(schema.TimeoutCreate)) * 0.8)
+	timeout := time.Minute * 5
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	spec := expandHostVirtualSwitchSpec(d)
@@ -123,7 +123,7 @@ func resourceVSphereHostVirtualSwitchDelete(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("error loading network system: %s", err)
 	}
 
-	timeout := time.Duration(float64(d.Timeout(schema.TimeoutCreate)) * 0.8)
+	timeout := time.Minute * 5
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	if err := ns.RemoveVirtualSwitch(ctx, d.Id()); err != nil {
