@@ -111,16 +111,18 @@ func schemaHostVirtualSwitchSpec() map[string]*schema.Schema {
 	s := map[string]*schema.Schema{
 		// HostVirtualSwitchSpec
 		"mtu": &schema.Schema{
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "The maximum transmission unit (MTU) of the virtual switch in bytes.",
-			Default:     1500,
+			Type:         schema.TypeInt,
+			Optional:     true,
+			Description:  "The maximum transmission unit (MTU) of the virtual switch in bytes.",
+			Default:      1500,
+			ValidateFunc: validation.IntBetween(1, 9000),
 		},
 		"number_of_ports": &schema.Schema{
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "The number of ports that this virtual switch is configured to use.",
-			Default:     128,
+			Type:         schema.TypeInt,
+			Optional:     true,
+			Description:  "The number of ports that this virtual switch is configured to use.",
+			Default:      128,
+			ValidateFunc: validation.IntBetween(0, 1024),
 		},
 	}
 	mergeSchema(s, schemaHostVirtualSwitchBondBridge())
