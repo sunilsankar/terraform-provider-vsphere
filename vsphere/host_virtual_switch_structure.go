@@ -21,16 +21,18 @@ func schemaHostVirtualSwitchBondBridge() map[string]*schema.Schema {
 
 		// LinkDiscoveryProtocolConfig
 		"link_discovery_operation": &schema.Schema{
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "Whether to advertise or listen for link discovery. Valid values are advertise, both, listen, and none.",
-			Default:     "listen",
+			Type:         schema.TypeString,
+			Optional:     true,
+			Description:  "Whether to advertise or listen for link discovery. Valid values are advertise, both, listen, and none.",
+			Default:      "listen",
+			ValidateFunc: validation.StringInSlice([]string{"advertise", "both", "listen", "none"}, false),
 		},
 		"link_discovery_protocol": &schema.Schema{
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "The discovery protocol type. Valid values are cdp and lldp.",
-			Default:     "cdp",
+			Type:         schema.TypeString,
+			Optional:     true,
+			Description:  "The discovery protocol type. Valid values are cdp and lldp.",
+			Default:      "cdp",
+			ValidateFunc: validation.StringInSlice([]string{"cdp", "lldp"}, false),
 		},
 
 		// HostVirtualSwitchBondBridge
