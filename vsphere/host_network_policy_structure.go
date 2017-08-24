@@ -2,8 +2,23 @@ package vsphere
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/vmware/govmomi/vim25/types"
 )
+
+const (
+	hostNetworkPolicyNicTeamingPolicyModeLoadbalanceIP     = "loadbalance_ip"
+	hostNetworkPolicyNicTeamingPolicyModeLoadbalanceSrcMac = "loadbalance_srcmac"
+	hostNetworkPolicyNicTeamingPolicyModeLoadbalanceSrcID  = "loadbalance_srcid"
+	hostNetworkPolicyNicTeamingPolicyModeFailoverExplicit  = "failover_explicit"
+)
+
+var hostNetworkPolicyNicTeamingPolicyAllowedValues = []string{
+	hostNetworkPolicyNicTeamingPolicyModeLoadbalanceIP,
+	hostNetworkPolicyNicTeamingPolicyModeLoadbalanceSrcMac,
+	hostNetworkPolicyNicTeamingPolicyModeLoadbalanceSrcID,
+	hostNetworkPolicyNicTeamingPolicyModeFailoverExplicit,
+}
 
 // schemaHostNetworkPolicy returns schema items for resources that need to work
 // with a HostNetworkPolicy, such as virtual switches and port groups.
@@ -30,9 +45,10 @@ func schemaHostNetworkPolicy() map[string]*schema.Schema {
 
 		// HostNicTeamingPolicy
 		"teaming_policy": &schema.Schema{
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "The network adapter teaming policy. Can be one of loadbalance_ip, loadbalance_srcmac, loadbalance_srcid, or failover_explicit.",
+			Type:         schema.TypeString,
+			Optional:     true,
+			Description:  "The network adapter teaming policy. Can be one of loadbalance_ip, loadbalance_srcmac, loadbalance_srcid, or failover_explicit.",
+			ValidateFunc: validation.StringInSlice(hostNetworkPolicyNicTeamingPolicyAllowedValues, false),
 		},
 		"notify_switches": &schema.Schema{
 			Type:        schema.TypeBool,

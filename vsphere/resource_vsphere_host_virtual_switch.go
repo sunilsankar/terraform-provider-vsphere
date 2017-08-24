@@ -38,7 +38,7 @@ func resourceVSphereHostVirtualSwitch() *schema.Resource {
 	s["active_nics"].Required = true
 	s["standby_nics"].Required = true
 
-	s["teaming_policy"].Default = "loadbalance_srcid"
+	s["teaming_policy"].Default = hostNetworkPolicyNicTeamingPolicyModeLoadbalanceSrcID
 	s["check_beacon"].Default = false
 	s["notify_switches"].Default = true
 	s["failback"].Default = true
