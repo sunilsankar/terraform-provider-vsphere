@@ -6,6 +6,18 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+var linkDiscoveryProtocolConfigOperationAllowedValues = []string{
+	string(types.LinkDiscoveryProtocolConfigOperationTypeNone),
+	string(types.LinkDiscoveryProtocolConfigOperationTypeListen),
+	string(types.LinkDiscoveryProtocolConfigOperationTypeAdvertise),
+	string(types.LinkDiscoveryProtocolConfigOperationTypeBoth),
+}
+
+var linkDiscoveryProtocolConfigProtocolAllowedValues = []string{
+	string(types.LinkDiscoveryProtocolConfigProtocolTypeCdp),
+	string(types.LinkDiscoveryProtocolConfigProtocolTypeLldp),
+}
+
 // schemaHostVirtualSwitchBondBridge returns schema items for resources that
 // need to work with a HostVirtualSwitchBondBridge, such as virtual switches.
 func schemaHostVirtualSwitchBondBridge() map[string]*schema.Schema {
@@ -24,15 +36,15 @@ func schemaHostVirtualSwitchBondBridge() map[string]*schema.Schema {
 			Type:         schema.TypeString,
 			Optional:     true,
 			Description:  "Whether to advertise or listen for link discovery. Valid values are advertise, both, listen, and none.",
-			Default:      "listen",
-			ValidateFunc: validation.StringInSlice([]string{"advertise", "both", "listen", "none"}, false),
+			Default:      string(types.LinkDiscoveryProtocolConfigOperationTypeListen),
+			ValidateFunc: validation.StringInSlice(linkDiscoveryProtocolConfigOperationAllowedValues, false),
 		},
 		"link_discovery_protocol": &schema.Schema{
 			Type:         schema.TypeString,
 			Optional:     true,
 			Description:  "The discovery protocol type. Valid values are cdp and lldp.",
-			Default:      "cdp",
-			ValidateFunc: validation.StringInSlice([]string{"cdp", "lldp"}, false),
+			Default:      string(types.LinkDiscoveryProtocolConfigProtocolTypeCdp),
+			ValidateFunc: validation.StringInSlice(linkDiscoveryProtocolConfigProtocolAllowedValues, false),
 		},
 
 		// HostVirtualSwitchBondBridge
