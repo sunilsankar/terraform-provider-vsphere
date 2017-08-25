@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/vmware/govmomi"
 )
 
 func TestAccResourceVSphereHostVirtualSwitch(t *testing.T) {
@@ -130,26 +128,21 @@ func testAccResourceVSphereHostVirtualSwitchPreCheck(t *testing.T) {
 
 func testAccResourceVSphereHostVirtualSwitchExists(expected bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources["vsphere_host_virtual_switch.switch"]
-		if !ok {
+		vars, err := testClientVariablesForResource(s, "vsphere_host_virtual_switch.switch")
+		if err != nil {
 			return errors.New("vsphere_host_virtual_switch.switch not found in state")
 		}
 
-		client := testAccProvider.Meta().(*govmomi.Client)
-		id := rs.Primary.ID
-		host := os.Getenv("VSPHERE_ESXI_HOST")
-		datacenter := os.Getenv("VSPHERE_DATACENTER")
-		timeout := time.Minute * 5
-		_, err := hostVSwitchFromName(client, id, host, datacenter, timeout)
+		_, err = hostVSwitchFromName(vars.client, vars.resourceID, vars.esxiHost, vars.datacenter, vars.timeout)
 		if err != nil {
-			if err.Error() == fmt.Sprintf("vSwitch %s not found on host %s", id, host) && !expected {
+			if err.Error() == fmt.Sprintf("vSwitch %s not found on host %s", vars.resourceID, vars.esxiHost) && !expected {
 				// Expected missing
 				return nil
 			}
 			return err
 		}
 		if !expected {
-			return fmt.Errorf("expected vSwitch %s to still be missing", id)
+			return fmt.Errorf("expected vSwitch %s to still be missing", vars.resourceID)
 		}
 		return nil
 	}

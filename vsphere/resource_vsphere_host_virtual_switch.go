@@ -131,6 +131,5 @@ func resourceVSphereHostVirtualSwitchDelete(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("error deleting host vSwitch: %s", err)
 	}
 
-	d.SetId("")
 	return nil
 }
