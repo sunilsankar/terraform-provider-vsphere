@@ -60,6 +60,7 @@ func resourceVSphereHostVirtualSwitch() *schema.Resource {
 
 func resourceVSphereHostVirtualSwitchCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*govmomi.Client)
+	name := d.Get("name").(string)
 	host := d.Get("host").(string)
 	datacenter := d.Get("datacenter").(string)
 	ns, err := hostNetworkSystemFromName(client, host, datacenter)
@@ -71,11 +72,11 @@ func resourceVSphereHostVirtualSwitchCreate(d *schema.ResourceData, meta interfa
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	spec := expandHostVirtualSwitchSpec(d)
-	if err := ns.AddVirtualSwitch(ctx, d.Get("name").(string), spec); err != nil {
+	if err := ns.AddVirtualSwitch(ctx, name, spec); err != nil {
 		return fmt.Errorf("error adding host vSwitch: %s", err)
 	}
 
-	d.SetId(d.Get("name").(string))
+	d.SetId(name)
 	return resourceVSphereHostVirtualSwitchRead(d, meta)
 }
 
