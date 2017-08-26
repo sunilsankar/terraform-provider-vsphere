@@ -3,10 +3,14 @@ package vsphere
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"sort"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 )
 
@@ -25,6 +29,17 @@ func dataSourceVSphereVmfsDisks() *schema.Resource {
 				Description: "The path to the datacenter the host is located in. This is ignored if connecting directly to ESXi. If not specified on vCenter, the default datacenter is used.",
 				Optional:    true,
 			},
+			"rescan": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Rescan the system for disks before querying. This may lengthen the time it takes to gather information.",
+				Optional:    true,
+			},
+			"filter": &schema.Schema{
+				Type:         schema.TypeString,
+				Description:  "A regular expression to filter the disks against. Only disks with canonical names that match will be included.",
+				Optional:     true,
+				ValidateFunc: validation.ValidateRegexp,
+			},
 			"disks": &schema.Schema{
 				Type:        schema.TypeList,
 				Description: "The names of the disks discovered by the search.",
@@ -39,33 +54,42 @@ func dataSourceVSphereVmfsDisksRead(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*govmomi.Client)
 	host := d.Get("host").(string)
 	datacenter := d.Get("datacenter").(string)
-	hss, err := hostDatastoreSystemFromName(client, host, datacenter)
+	ss, err := hostStorageSystemFromName(client, host, datacenter)
 	if err != nil {
 		return fmt.Errorf("error loading host datastore system: %s", err)
 	}
 
+	if d.Get("rescan").(bool) {
+		ctx, cancel := context.WithTimeout(context.Background(), defaultAPITimeout)
+		defer cancel()
+		if err := ss.RescanAllHba(ctx); err != nil {
+			return err
+		}
+	}
+
+	var hss mo.HostStorageSystem
 	ctx, cancel := context.WithTimeout(context.Background(), defaultAPITimeout)
 	defer cancel()
-	disks, err := hss.QueryAvailableDisksForVmfs(ctx)
-	if err != nil {
-		return fmt.Errorf("error querying for disks: %s", err)
+	if err := ss.Properties(ctx, ss.Reference(), nil, &hss); err != nil {
+		return fmt.Errorf("error querying storage system properties: %s", err)
 	}
 
 	d.SetId(time.Now().UTC().String())
 
-	if saveVmfsDiskNames(disks, d); err != nil {
+	var disks []string
+	for _, sl := range hss.StorageDeviceInfo.ScsiLun {
+		if hsd, ok := sl.(*types.HostScsiDisk); ok {
+			if matched, _ := regexp.MatchString(d.Get("filter").(string), hsd.CanonicalName); matched {
+				disks = append(disks, hsd.CanonicalName)
+			}
+		}
+	}
+
+	sort.Strings(disks)
+
+	if err := d.Set("disks", disks); err != nil {
 		return fmt.Errorf("error saving results to state: %s", err)
 	}
 
 	return nil
-}
-
-// saveVmfsDiskNames saves the CanonicalNames of the search results to the to
-// the "disks" attribute in the passed in ResourceData.
-func saveVmfsDiskNames(disks []types.HostScsiDisk, d *schema.ResourceData) error {
-	var s []string
-	for _, disk := range disks {
-		s = append(s, disk.CanonicalName)
-	}
-	return d.Set("disks", s)
 }
