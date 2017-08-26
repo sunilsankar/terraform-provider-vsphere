@@ -3,6 +3,7 @@ package vsphere
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vmware/govmomi"
@@ -49,6 +50,8 @@ func dataSourceVSphereVmfsDisksRead(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return fmt.Errorf("error querying for disks: %s", err)
 	}
+
+	d.SetId(time.Now().UTC().String())
 
 	if saveVmfsDiskNames(disks, d); err != nil {
 		return fmt.Errorf("error saving results to state: %s", err)

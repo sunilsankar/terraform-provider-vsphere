@@ -79,6 +79,10 @@ func Provider() terraform.ResourceProvider {
 			"vsphere_license":         resourceVSphereLicense(),
 		},
 
+		DataSourcesMap: map[string]*schema.Resource{
+			"vsphere_vmfs_disks": dataSourceVSphereVmfsDisks(),
+		},
+
 		ConfigureFunc: providerConfigure,
 	}
 }
