@@ -21,7 +21,7 @@ func dataSourceVSphereVmfsDisks() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"host": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "The name of the host to put this virtual switch on. This is ignored if connecting directly to ESXi, but required if not.",
+				Description: "The name of the host to search for disks on. This is ignored if connecting directly to ESXi, but required if not.",
 				Optional:    true,
 			},
 			"datacenter": &schema.Schema{
