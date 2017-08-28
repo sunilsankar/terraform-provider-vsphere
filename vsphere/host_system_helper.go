@@ -17,24 +17,18 @@ func hostSystemOrDefault(client *govmomi.Client, host, datacenter string) (*obje
 
 	var hs *object.HostSystem
 	var err error
+	dc, err := getDatacenter(client, datacenter)
+	if err != nil {
+		return nil, fmt.Errorf("could not get datacenter: %s", err)
+	}
+	finder.SetDatacenter(dc)
+
+	ctx, cancel := context.WithTimeout(context.Background(), defaultAPITimeout)
+	defer cancel()
 	switch t := client.ServiceContent.About.ApiType; t {
 	case "HostAgent":
-		dc, err := getDatacenter(client, "")
-		if err != nil {
-			return nil, fmt.Errorf("could not get datacenter: %s", err)
-		}
-		finder.SetDatacenter(dc)
-		ctx, cancel := context.WithTimeout(context.Background(), defaultAPITimeout)
-		defer cancel()
 		hs, err = finder.DefaultHostSystem(ctx)
 	case "VirtualCenter":
-		dc, err := getDatacenter(client, datacenter)
-		if err != nil {
-			return nil, fmt.Errorf("could not get datacenter: %s", err)
-		}
-		finder.SetDatacenter(dc)
-		ctx, cancel := context.WithTimeout(context.Background(), defaultAPITimeout)
-		defer cancel()
 		hs, err = finder.HostSystem(ctx, host)
 	default:
 		return nil, fmt.Errorf("unsupported ApiType: %s", t)

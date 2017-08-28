@@ -227,11 +227,15 @@ func deleteFolder(client *govmomi.Client, f *folder) error {
 // getDatacenter gets datacenter object
 func getDatacenter(c *govmomi.Client, dc string) (*object.Datacenter, error) {
 	finder := find.NewFinder(c.Client, true)
-	if dc != "" {
-		d, err := finder.Datacenter(context.TODO(), dc)
-		return d, err
-	} else {
-		d, err := finder.DefaultDatacenter(context.TODO())
-		return d, err
+	t := c.ServiceContent.About.ApiType
+	switch t {
+	case "HostAgent":
+		return finder.DefaultDatacenter(context.TODO())
+	case "VirtualCenter":
+		if dc != "" {
+			return finder.Datacenter(context.TODO(), dc)
+		}
+		return finder.DefaultDatacenter(context.TODO())
 	}
+	return nil, fmt.Errorf("unsupported ApiType: %s", t)
 }
