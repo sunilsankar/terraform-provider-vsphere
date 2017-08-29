@@ -35,7 +35,6 @@ func resourceVSphereVmfsDatastore() *schema.Resource {
 			Required:    true,
 			MinItems:    1,
 			Elem:        &schema.Schema{Type: schema.TypeString},
-			// ValidateFunc: validation.ValidateListUniqueStrings,
 		},
 	}
 	mergeSchema(s, schemaDatastoreSummary())
